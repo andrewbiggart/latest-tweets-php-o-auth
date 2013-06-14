@@ -11,7 +11,6 @@ Overview
 - A configuration parameter allows you to specify how many tweets are displayed
 - Dates can optionally be displayed in “Twitter style”, e.g. "12 minutes ago"
 - You can edit the HTML that wraps your tweets, tweet status and meta information
-- The username which prepends each tweet in Twitter RSS feeds is automatically stripped
 
 Parameters
 ========================
