@@ -5,7 +5,7 @@
 	 * 
 	 * @version	1.0
 	 * @author	Andrew Biggart
-	 * @link	http://
+	 * @link	https://github.com/andrewbiggart/latest-tweets-php-o-auth/
 	 * 
 	 * Notes:
 	 * Caching is employed because Twitter only allows their RSS and json feeds to be accesssed 150
