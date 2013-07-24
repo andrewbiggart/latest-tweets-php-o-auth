@@ -83,7 +83,7 @@
 
 			'date_format'         => 'g:i A M jS',    // Date formatting. (http://php.net/manual/en/function.date.php)
 			'twitter_style_dates' => true,            // Twitter style days. [about an hour ago] (Default : true)
-			'timezone'            => 'America/New_York',
+			'timezone'            => 'UTC',
 
 			'cache_file'          => 'tweets.html',  // Change this to the path of your cache file. (Default : ./tweets.txt)
 			'cachetime'           => 180,             // Seconds to cache feed (Default : 1 minute).
