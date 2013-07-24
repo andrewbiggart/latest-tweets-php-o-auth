@@ -2,3 +2,4 @@
 .*.swp
 .svn
 /cache/*
+!/cache/readme.txt
