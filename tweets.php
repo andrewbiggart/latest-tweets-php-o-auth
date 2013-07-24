@@ -2,23 +2,23 @@
 
 	/**
 	 * Twitter feed which uses twitteroauth for authentication
-	 * 
+	 *
 	 * @version	1.0
 	 * @author	Andrew Biggart
 	 * @link	https://github.com/andrewbiggart/latest-tweets-php-o-auth/
-	 * 
+	 *
 	 * Notes:
 	 * Caching is employed because Twitter only allows their RSS and json feeds to be accesssed 150
 	 * times an hour per user client.
 	 * --
-	 * Dates can be displayed in Twitter style (e.g. "1 hour ago") by setting the 
+	 * Dates can be displayed in Twitter style (e.g. "1 hour ago") by setting the
 	 * $twitter_style_dates param to true.
 	 *
 	 * You will also need to register your application with Twitter, to get your keys and tokens.
 	 * You can do this here: (https://dev.twitter.com/).
 	 *
 	 * Don't forget to add your username to the bottom of the script.
-	 * 
+	 *
 	 * Credits:
 	 ***************************************************************************************
 	 * Initial script before API v1.0 was retired
@@ -42,87 +42,103 @@
 	 *
 	 *
 	**/
- 
+
 	// Session start
-	session_start(); 
-	
+	session_start();
+
 	// Set timezone. (Modify to match your timezone) If you need help with this, you can find it here. (http://php.net/manual/en/timezones.php)
-	date_default_timezone_set('Europe/London');
-	
+
 	// Require TwitterOAuth files. (Downloadable from : https://github.com/abraham/twitteroauth)
 	require_once("twitteroauth/twitteroauth/twitteroauth.php");
-	
+
 	// Function to authenticate app with Twitter.
 	function getConnectionWithAccessToken($cons_key, $cons_secret, $oauth_token, $oauth_token_secret) {
 	  $connection = new TwitterOAuth($cons_key, $cons_secret, $oauth_token, $oauth_token_secret);
 	  return $connection;
 	}
-	
+
 	// Function to display the latest tweets.
-	function display_latest_tweets(
-		
+	/** get_latest_tweets
+	 *
+	 * @param array $params
+	 * @return string
+	 */
+	function get_latest_tweets($params) {
+
 		// Function parameters.
-		$twitter_user_id,
-		$cache_file          = './tweets.txt',  // Change this to the path of your cache file. (Default : ./tweets.txt)
-		$tweets_to_display   = 5,               // Number of tweets you would like to display. (Default : 5)
-		$ignore_replies      = false,           // Ignore replies from the timeline. (Default : false)
-		$include_rts         = false,           // Include retweets. (Default : false)
-		$twitter_wrap_open   = '<ul class="home-tweets-ul">',
-		$twitter_wrap_close  = '</ul>',
-		$tweet_wrap_open     = '<li><p class="home-tweet-tweet">',
-		$meta_wrap_open      = '<br/><span class="home-tweet-date">',
-		$meta_wrap_close     = '</span>',
-		$tweet_wrap_close    = '</p></li>',
-		$date_format         = 'g:i A M jS',    // Date formatting. (http://php.net/manual/en/function.date.php)
-		$twitter_style_dates = true){           // Twitter style days. [about an hour ago] (Default : true)
-			
-		// Twitter keys (You'lll need to visit https://dev.twitter.com and register to get these.
-		$consumerkey         = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
-		$consumersecret      = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
-		$accesstoken         = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
-		$accesstokensecret   = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
-		
-		// Seconds to cache feed (Default : 1 minute).
-		$cachetime           = 60*3;
-		
+		$defaults = array(
+			'twitter_user_id'     => '',
+			'tweets_to_display'   => 5,               // Number of tweets you would like to display. (Default : 5)
+			'ignore_replies'      => false,           // Ignore replies from the timeline. (Default : false)
+			'include_rts'         => false,           // Include retweets. (Default : false)
+
+			'twitter_wrap_open'   => '<ul class="home-tweets-ul">',
+			'twitter_wrap_close'  => '</ul>',
+
+			'tweet_wrap_open'     => '<li><p class="home-tweet-tweet">',
+			'tweet_wrap_close'    => '</p></li>',
+
+			'meta_wrap_open'      => '<br/><span class="home-tweet-date">',
+			'meta_wrap_close'     => '</span>',
+
+			'date_format'         => 'g:i A M jS',    // Date formatting. (http://php.net/manual/en/function.date.php)
+			'twitter_style_dates' => true,            // Twitter style days. [about an hour ago] (Default : true)
+			'timezone'            => 'UTC',
+
+			'cache_file'          => 'tweets.html',  // Change this to the path of your cache file. (Default : ./tweets.txt)
+			'cachetime'           => 180,             // Seconds to cache feed (Default : 1 minute).
+
+			// Twitter keys (You'll need to visit https://dev.twitter.com and register to get these.
+			'consumerkey'         => "xxxxxxxxxxxxxxxxxxxxxxxxxxx",
+			'consumersecret'      => "xxxxxxxxxxxxxxxxxxxxxxxxxxx",
+			'accesstoken'         => "xxxxxxxxxxxxxxxxxxxxxxxxxxx",
+			'accesstokensecret'   => "xxxxxxxxxxxxxxxxxxxxxxxxxxx"
+		);
+
+		$params = array_merge($defaults,$params);
+
+		$params['cache_file'] = dirname(__FILE__).'/cache/'.$params['cache_file'];
+
+		date_default_timezone_set($params['timezone']);
+
 		// Time that the cache was last updtaed.
-		$cache_file_created  = ((file_exists($cache_file))) ? filemtime($cache_file) : 0;
- 
+		$cache_file_created  = ((file_exists($params['cache_file']))) ? filemtime($params['cache_file']) : 0;
+
 		// A flag so we know if the feed was successfully parsed.
 		$tweet_found         = false;
-		
+
 		// Show cached version of tweets, if it's less than $cachetime.
-		if (time() - $cachetime < $cache_file_created) {
+		if (time() - $params['cachetime'] < $cache_file_created) {
 	 		$tweet_found = true;
 			// Display tweets from the cache.
-			readfile($cache_file);		 
+			readfile($params['cache_file']);
 		} else {
-		
-		// Cache file not found, or old. Authenticae app.
-		$connection = getConnectionWithAccessToken($consumerkey, $consumersecret, $accesstoken, $accesstokensecret);
-		
+
+		// Cache file not found, or old. Authenticate app.
+		$connection = getConnectionWithAccessToken($params['consumerkey'], $params['consumersecret'], $params['accesstoken'], $params['accesstokensecret']);
+
 			if($connection){
 				// Get the latest tweets from Twitter
- 				$get_tweets = $connection->get("https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=".$twitter_user_id."&count=".$tweets_to_display."&include_rts=".$include_rts);
-				
+ 				$get_tweets = $connection->get("https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=".$params['twitter_user_id']."&count=".$params['tweets_to_display']."&include_rts=".$params['include_rts']);
+
 				// Error check: Make sure there is at least one item.
 				if (count($get_tweets)) {
- 					
+
 					// Define tweet_count as zero
 					$tweet_count = 0;
- 
+
 					// Start output buffering.
-					ob_start();
- 
+					// ob_start();
+
 					// Open the twitter wrapping element.
-					$twitter_html = $twitter_wrap_open;
- 
+					$twitter_html = $params['twitter_wrap_open'];
+
 					// Iterate over tweets.
 					foreach($get_tweets as $tweet) {
-						
+
 						// If we are not ignoring replies, or tweet is not a reply, process it.
-						if ($ignore_replies==false){
- 
+						if ($params['ignore_replies']==false){
+
 							$tweet_found = true;
 							$tweet_count++;
  							$tweet_desc = $tweet->text;
@@ -130,68 +146,68 @@
 							$tweet_desc = preg_replace('/(https?:\/\/[^\s"<>]+)/','<a href="$1" target="_blank">$1</a>',$tweet_desc);
 							$tweet_desc = preg_replace('/(^|[\n\s])@([^\s"\t\n\r<:]*)/is', '$1<a href="http://twitter.com/$2" target="_blank">@$2</a>', $tweet_desc);
 							$tweet_desc = preg_replace('/(^|[\n\s])#([^\s"\t\n\r<:]*)/is', '$1<a href="http://twitter.com/search?q=%23$2" target="_blank">#$2</a>', $tweet_desc);
- 
+
  							// Convert Tweet display time to a UNIX timestamp. Twitter timestamps are in UTC/GMT time.
-							$tweet_time = strtotime($tweet->created_at);	
- 							if ($twitter_style_dates){
+							$tweet_time = strtotime($tweet->created_at);
+ 							if ($params['twitter_style_dates']){
 								// Current UNIX timestamp.
 								$current_time = time();
 								$time_diff = abs($current_time - $tweet_time);
-								switch ($time_diff) 
+								switch ($time_diff)
 								{
 									case ($time_diff < 60):
-										$display_time = $time_diff.' seconds ago';                  
-										break;      
+										$display_time = $time_diff.' seconds ago';
+										break;
 									case ($time_diff >= 60 && $time_diff < 3600):
 										$min = floor($time_diff/60);
-										$display_time = $min.' minutes ago';                  
-										break;      
+										$display_time = $min.' minutes ago';
+										break;
 									case ($time_diff >= 3600 && $time_diff < 86400):
 										$hour = floor($time_diff/3600);
 										$display_time = 'about '.$hour.' hour';
 										if ($hour > 1){ $display_time .= 's'; }
 										$display_time .= ' ago';
-										break;          
+										break;
 									default:
-										$display_time = date($date_format,$tweet_time);
+										$display_time = date($params['date_format'],$tweet_time);
 										break;
 								}
  							} else {
- 								$display_time = date($date_format,$tweet_time);
+ 								$display_time = date($params['date_format'],$tweet_time);
  							}
- 
+
 							// Render the tweet.
-							$twitter_html .= $tweet_wrap_open.html_entity_decode($tweet_desc).$meta_wrap_open.'<a href="http://twitter.com/'.$twitter_user_id.'">'.$display_time.'</a>'.$meta_wrap_close.$tweet_wrap_close;
- 
+							$twitter_html .= $params['tweet_wrap_open'].html_entity_decode($tweet_desc).$params['meta_wrap_open'].'<a href="http://twitter.com/'.$params['twitter_user_id'].'">'.$display_time.'</a>'.$params['meta_wrap_close'].$params['tweet_wrap_close'];
+
 						}
- 
+
 						// If we have processed enough tweets, stop.
-						if ($tweet_count >= $tweets_to_display){
+						if ($tweet_count >= $params['tweets_to_display']){
 							break;
 						}
- 
+
 					}
- 
+
 					// Close the twitter wrapping element.
-					$twitter_html .= $twitter_wrap_close;
-					echo $twitter_html;
- 
+					$twitter_html .= $params['twitter_wrap_close'];
+					// echo $twitter_html;
+
 					// Generate a new cache file.
-					$file = fopen($cache_file, 'w');
- 
-					// Save the contents of output buffer to the file, and flush the buffer. 
-					fwrite($file, ob_get_contents()); 
-					fclose($file); 
-					ob_end_flush();
-					
+					$file = fopen($params['cache_file'], 'w');
+
+					// Save the contents of output buffer to the file, and flush the buffer.
+					fwrite($file, $twitter_html);
+					fclose($file);
+					// ob_end_flush();
+
+					return $twitter_html;
+
 				}
-				
+
 			}
-			
+
 		}
-		
+
 	}
-	
-	// Display latest tweets. (Modify username to your Twitter handle)
-	display_latest_tweets('andrew_biggart');
+
 ?>
