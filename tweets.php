@@ -85,7 +85,7 @@
 			'twitter_style_dates' => true,            // Twitter style days. [about an hour ago] (Default : true)
 			'timezone'            => 'America/New_York',
 
-			'cache_file'          => './tweets.txt',  // Change this to the path of your cache file. (Default : ./tweets.txt)
+			'cache_file'          => 'tweets.html',  // Change this to the path of your cache file. (Default : ./tweets.txt)
 			'cachetime'           => 180,             // Seconds to cache feed (Default : 1 minute).
 
 			// Twitter keys (You'll need to visit https://dev.twitter.com and register to get these.
@@ -96,6 +96,8 @@
 		);
 
 		$params = array_merge($defaults,$params);
+
+		$params['cache_file'] = dirname(__FILE__).'/cache/'.$params['cache_file'];
 
 		date_default_timezone_set($params['timezone']);
 
