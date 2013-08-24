@@ -103,7 +103,7 @@
 		
 			if($connection){
 				// Get the latest tweets from Twitter
- 				$get_tweets = $connection->get("https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=".$twitter_user_id."&count=".$tweets_to_display."&include_rts=".$include_rts);
+ 				$get_tweets = $connection->get("https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=".$twitter_user_id."&count=".$tweets_to_display."&include_rts=".$include_rts."&exclude_replies=".$ignore_replies);
 				
 				// Error check: Make sure there is at least one item.
 				if (count($get_tweets)) {
@@ -120,9 +120,6 @@
 					// Iterate over tweets.
 					foreach($get_tweets as $tweet) {
 						
-						// If we are not ignoring replies, or tweet is not a reply, process it.
-						if ($ignore_replies==false){
- 
 							$tweet_found = true;
 							$tweet_count++;
  							$tweet_desc = $tweet->text;
@@ -162,8 +159,6 @@
  
 							// Render the tweet.
 							$twitter_html .= $tweet_wrap_open.html_entity_decode($tweet_desc).$meta_wrap_open.'<a href="http://twitter.com/'.$twitter_user_id.'">'.$display_time.'</a>'.$meta_wrap_close.$tweet_wrap_close;
- 
-						}
  
 						// If we have processed enough tweets, stop.
 						if ($tweet_count >= $tweets_to_display){
