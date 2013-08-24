@@ -132,7 +132,10 @@
 							$tweet_desc = preg_replace('/(^|[\n\s])#([^\s"\t\n\r<:]*)/is', '$1<a href="http://twitter.com/search?q=%23$2" target="_blank">#$2</a>', $tweet_desc);
  
  							// Convert Tweet display time to a UNIX timestamp. Twitter timestamps are in UTC/GMT time.
-							$tweet_time = strtotime($tweet->created_at);	
+							$tweet_time = strtotime($tweet->created_at);
+							
+							// Get Tweet ID
+							$tweet_id   = $tweet->id_str;
  							if ($twitter_style_dates){
 								// Current UNIX timestamp.
 								$current_time = time();
@@ -161,7 +164,7 @@
  							}
  
 							// Render the tweet.
-							$twitter_html .= $tweet_wrap_open.html_entity_decode($tweet_desc).$meta_wrap_open.'<a href="http://twitter.com/'.$twitter_user_id.'">'.$display_time.'</a>'.$meta_wrap_close.$tweet_wrap_close;
+							$twitter_html .= $tweet_wrap_open.html_entity_decode($tweet_desc).$meta_wrap_open.'<a href="http://twitter.com/'.$twitter_user_id.'/status/'.$tweet_id.'">'.$display_time.'</a>'.$meta_wrap_close.$tweet_wrap_close;
  
 						}
  
