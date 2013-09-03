@@ -76,7 +76,7 @@
 		$date_format         = 'g:i A M jS',    // Date formatting. (http://php.net/manual/en/function.date.php)
 		$twitter_style_dates = true){           // Twitter style days. [about an hour ago] (Default : true)
 			
-		// Twitter keys (You'lll need to visit https://dev.twitter.com and register to get these.
+		// Twitter keys (You'll need to visit https://dev.twitter.com and register to get these.
 		$consumerkey         = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 		$consumersecret      = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 		$accesstoken         = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
