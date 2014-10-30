@@ -42,9 +42,6 @@
 	 *
 	 *
 	**/
- 
-	// Session start
-	session_start(); 
 	
 	// Set timezone. (Modify to match your timezone) If you need help with this, you can find it here. (http://php.net/manual/en/timezones.php)
 	date_default_timezone_set('Europe/London');
