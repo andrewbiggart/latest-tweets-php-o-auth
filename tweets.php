@@ -79,7 +79,7 @@
 		$accesstoken         = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 		$accesstokensecret   = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 		
-		// Seconds to cache feed (Default : 1 minute).
+		// Seconds to cache feed (Default : 3 minutes).
 		$cachetime           = 60*3;
 		
 		// Time that the cache was last updtaed.
