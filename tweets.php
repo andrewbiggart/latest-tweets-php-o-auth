@@ -125,6 +125,14 @@
 							$tweet_desc = preg_replace("/[@]+([A-Za-z0-9-_]+)/", "<a href=\"http://twitter.com/\\1\" target=\"_blank\">\\0</a>", $tweet_desc );
 							$tweet_desc = preg_replace("/[#]+([A-Za-z0-9-_]+)/", "<a href=\"http://twitter.com/search?q=%23\\1\" target=\"_blank\">\\0</a>", $tweet_desc );
  
+ 
+              // replace t.co links with expanded link, if present
+              $entities = $tweet->entities;
+              if(!empty($entities->urls[0]->expanded_url)) {
+              $tweet_desc = str_replace($entities->urls[0]->url, $entities->urls[0]->expanded_url, $tweet_desc);
+              }
+ 
+ 
  							// Convert Tweet display time to a UNIX timestamp. Twitter timestamps are in UTC/GMT time.
 							$tweet_time = strtotime($tweet->created_at);	
  							if ($twitter_style_dates){
