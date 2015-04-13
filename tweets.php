@@ -131,6 +131,11 @@
               if(!empty($entities->urls[0]->expanded_url)) {
               $tweet_desc = str_replace($entities->urls[0]->url, $entities->urls[0]->expanded_url, $tweet_desc);
               }
+                 $media_url = $entities->media[0]->media_url;
+		 if($media_url) {
+ 		 $img = "<img src='".$media_url."'>";
+ 		 $twitter_html .= $img;
+ 		}
  
  
  							// Convert Tweet display time to a UNIX timestamp. Twitter timestamps are in UTC/GMT time.
