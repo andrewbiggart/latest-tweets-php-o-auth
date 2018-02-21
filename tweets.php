@@ -60,7 +60,7 @@
 		
 		// Function parameters.
 		$twitter_user_id,
-		$cache_file          = './tweets.txt',  // Change this to the path of your cache file. (Default : ./tweets.txt)
+		$cache_file          = './tweets-'.$twitter_user_id.'.txt',  // Change this to the path of your cache file. (Default : ./tweets.txt)
 		$tweets_to_display   = 5,               // Number of tweets you would like to display. (Default : 5)
 		$ignore_replies      = false,           // Ignore replies from the timeline. (Default : false)
 		$include_rts         = false,           // Include retweets. (Default : false)
